@@ -225,3 +225,52 @@ public:
                 }
             }
         }
+if (changeDirection) {
+            alienDirection *= -1;
+            for (auto& alien : aliens) {
+                alien.move(0, 1);
+            }
+        }
+        
+        for (auto& alien : aliens) {
+            alien.move(alienDirection, 0);
+        }
+        
+        // Check collisions
+        for (auto& bullet : bullets) {
+            if (bullet.isActive()) {
+                for (auto& alien : aliens) {
+                    if (alien.isActive() && 
+                        bullet.getX() == alien.getX() && 
+                        bullet.getY() == alien.getY()) {
+                        bullet.deactivate();
+                        alien.destroy();
+                        score += 10;
+                    }
+                }
+            }
+        }
+        
+        // Check win condition
+        bool allAliensDestroyed = true;
+        for (auto& alien : aliens) {
+            if (alien.isActive()) {
+                allAliensDestroyed = false;
+                break;
+            }
+        }
+        
+        if (allAliensDestroyed) {
+            gameOver = true;
+            won = true;
+        }
+        
+        // Check lose condition
+        for (auto& alien : aliens) {
+            if (alien.isActive() && alien.getY() >= player.getY() - 1) {
+                gameOver = true;
+                won = false;
+                break;
+            }
+        }
+    }

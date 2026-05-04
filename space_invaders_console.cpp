@@ -91,4 +91,13 @@ public:
     int getY() const { return y; }
     
     void destroy() { active = false; }
-    
+
+void draw(HANDLE hConsole) {
+        if (active) {
+            COORD pos = {x, y};
+            SetConsoleCursorPosition(hConsole, pos);
+            SetConsoleTextAttribute(hConsole, 12); // Red
+            cout << "@";
+        }
+    }
+};

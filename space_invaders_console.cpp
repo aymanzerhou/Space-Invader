@@ -274,3 +274,103 @@ if (changeDirection) {
             }
         }
     }
+void draw() {
+        clearScreen();
+        
+        // Draw game objects
+        player.draw(hConsole);
+        
+        for (auto& bullet : bullets) {
+            bullet.draw(hConsole);
+        }
+        
+        for (auto& alien : aliens) {
+            alien.draw(hConsole);
+        }
+        
+        // Draw score
+        COORD pos = {2, 0};
+        SetConsoleCursorPosition(hConsole, pos);
+        SetConsoleTextAttribute(hConsole, 15); // White
+        cout << "Score: " << score;
+        
+        // Draw instructions
+        pos = {WIDTH - 25, 0};
+        SetConsoleCursorPosition(hConsole, pos);
+        cout << "Arrows: Move Space: Shoot";
+        
+        // Draw game over message
+        if (gameOver) {
+            pos = {WIDTH / 2 - 10, HEIGHT / 2};
+            SetConsoleCursorPosition(hConsole, pos);
+            SetConsoleTextAttribute(hConsole, won ? 10 : 12); // Green for win, Red for lose
+            cout << (won ? "YOU WIN!" : "GAME OVER!");
+            
+            pos = {WIDTH / 2 - 12, HEIGHT / 2 + 1};
+            SetConsoleCursorPosition(hConsole, pos);
+            SetConsoleTextAttribute(hConsole, 15);
+            cout << "Press R to Restart";
+        }
+    }
+    
+    void restart() {
+        score = 0;
+        alienDirection = 1;
+        gameOver = false;
+        won = false;
+        bullets.clear();
+        aliens.clear();
+        player = Player();
+        
+        // Recreate alien grid
+        for (int row = 0; row < 4; row++) {
+            for (int col = 0; col < 10; col++) {
+                aliens.push_back(Alien(10 + col * 6, 3 + row * 2));
+            }
+        }
+    }
+    
+    void run() {
+        // Setup console
+        system("cls");
+        SetConsoleTextAttribute(hConsole, 15);
+        
+        // Hide cursor
+        CONSOLE_CURSOR_INFO cursorInfo;
+        GetConsoleCursorInfo(hConsole, &cursorInfo);
+        cursorInfo.bVisible = false;
+        SetConsoleCursorInfo(hConsole, &cursorInfo);
+        
+        // Game loop
+        while (true) {
+            handleInput();
+            update();
+            draw();
+            Sleep(100); // Control game speed
+            
+            // Check for ESC key to exit
+            if (_kbhit() && _getch() == 27) break;
+        }
+        
+        // Show cursor before exit
+        cursorInfo.bVisible = true;
+        SetConsoleCursorInfo(hConsole, &cursorInfo);
+    }
+};
+
+int main() {
+    cout << "=== SPACE INVADERS ===" << endl;
+    cout << "Controls:" << endl;
+    cout << "Arrow Keys: Move left/right" << endl;
+    cout << "Space: Shoot" << endl;
+    cout << "R: Restart (when game over)" << endl;
+    cout << "ESC: Exit game" << endl;
+    cout << "Press any key to start..." << endl;
+    _getch();
+    
+    Game game;
+    game.run();
+    
+    return 0;
+}
+
